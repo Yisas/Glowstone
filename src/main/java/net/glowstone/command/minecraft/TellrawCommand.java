@@ -58,9 +58,14 @@ public class TellrawCommand extends VanillaCommand {
                 return false;
             }
             if (obj instanceof JSONArray || obj instanceof JSONObject) {
-                BaseComponent[] components = ComponentSerializer.parse(json);
-                player.sendMessage(components);
-                return true;
+                try {
+                    BaseComponent[] components = ComponentSerializer.parse(json);
+                    player.sendMessage(components);
+                    return true;
+                } catch (Exception e) {
+                    sender.sendMessage("Invalid message");
+                }
+                return false;
             } else {
                 sender.sendMessage(ChatColor.RED + "Failed to parse JSON");
                 return false;
