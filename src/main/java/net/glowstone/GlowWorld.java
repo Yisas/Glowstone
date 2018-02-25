@@ -203,6 +203,10 @@ public final class GlowWorld implements World {
      */
     @Getter
     private final long seed;
+    
+    public  long getSeed() {
+    	 return this.seed;
+    }
     /**
      * Contains how regular blocks should be pulsed.
      */

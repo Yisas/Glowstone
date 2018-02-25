@@ -44,14 +44,21 @@ public class SeedCommandTest {
 		sender = PowerMockito.mock(CommandSender.class);
 		world = PowerMockito.mock(World.class);
 		gworld = PowerMockito.mock(GlowWorld.class);
-		
+		vCommand = PowerMockito.mock(VanillaCommand.class);
+		commandUtils = PowerMockito.mock(CommandUtils.class);
 		mockStatic(CommandUtils.class);
 		when(CommandUtils.getWorld(sender)).thenReturn(gworld);
-		when(world.getSeed()).thenReturn((long) 100);
+		when(world.getSeed()).thenReturn((long) 0);
 		
 	}
 	
-	
+	@Test
+	public void testExecuteSuccess() {
+		Mockito.when(sender.hasPermission(Mockito.anyString())).thenReturn(true);
+		final boolean commandResult = command.execute(sender, "label", new String[]{"50"});
+		assertThat(commandResult, is(true));
+		Mockito.verify(sender).sendMessage(eq("Seed: 0"));
+	}
 	
 	@Test
 	public void testExecuteFailure() {
