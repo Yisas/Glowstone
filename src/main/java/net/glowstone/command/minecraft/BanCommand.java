@@ -28,7 +28,7 @@ public class BanCommand extends VanillaCommand {
         }
         if (args.length > 0) {
             String name = args[0];
-            GlowServer server = (GlowServer) sender.getServer();
+            GlowServer server = (GlowServer) Bukkit.getServer();
             // asynchronously lookup player
             server.getOfflinePlayerAsync(name).whenCompleteAsync((player, ex) -> {
                 if (ex != null) {

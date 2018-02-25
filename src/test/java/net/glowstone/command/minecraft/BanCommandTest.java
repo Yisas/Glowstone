@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 import net.glowstone.GlowServer;
 import net.glowstone.GlowWorld;
 import net.glowstone.command.CommandUtils;
-import net.glowstone.entity.meta.profile.GlowPlayerProfile;
-import net.glowstone.entity.objects.GlowMinecart;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,12 +12,14 @@ import org.bukkit.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,11 +33,9 @@ public class BanCommandTest {
 
     private Command command;
     private CommandSender blockedSender, sender;
-    private GlowServer server;
     private GlowWorld world;
     private Player player1, player2;
-    private UUID uuid;
-
+    private GlowServer server;
 
     @Before
     public void before() {
@@ -48,8 +46,6 @@ public class BanCommandTest {
         world = mock(GlowWorld.class);
         player1 = mock(Player.class);
         player2 = mock(Player.class);
-        uuid = UUID.randomUUID();
-
 
         Location location = new Location(world, 10.5, 20.0, 30.5);
         Mockito.when(player1.getName()).thenReturn("player1");
@@ -61,18 +57,19 @@ public class BanCommandTest {
 
         Mockito.when(server.getOfflinePlayerAsync("player1")).thenReturn(CompletableFuture.completedFuture(player1));
         Mockito.when(server.getOfflinePlayerAsync("player2")).thenReturn(CompletableFuture.completedFuture(player2));
+        Mockito.when(server.getOfflinePlayerAsync("player3")).thenReturn(CompletableFuture.completedFuture(null));
+        Mockito.when(server.getPlayer("player1")).thenReturn(player1);
 
         Mockito.when(sender.hasPermission(Mockito.anyString())).thenReturn(true);
         Mockito.when(sender.getServer()).thenReturn(server);
-
-        Mockito.when(server.getOfflinePlayerAsync("player3")).thenReturn(CompletableFuture.completedFuture(null));
-        Mockito.when(server.getPlayer("player1")).thenReturn(player1);
 
         Mockito.when(world.getEntities())
                 .thenReturn(ImmutableList.of(player1));
         PowerMockito.stub(PowerMockito.method(CommandUtils.class, "getWorld", CommandSender.class))
                 .toReturn(world);
 
+        mockStatic(Bukkit.class);
+        when(Bukkit.getServer()).thenReturn(server);
     }
 
     @Test
@@ -96,13 +93,13 @@ public class BanCommandTest {
     }
 
     @Test
-    public void testExecuteOnePlayerSuccessful() {
+    public void testExecuteSuccessOnePlayer() {
         String[] args = new String[]{"player1"};
         assertThat(command.execute(sender, "label", args), is(true));
     }
 
     @Test
-    public void testExecuteMultiplePlayersSuccessful() {
+    public void testExecuteSuccessMultiplePlayers() {
         String[] args = new String[]{"player1", "player2"};
         assertThat(command.execute(sender, "label", args), is(true));
     }
