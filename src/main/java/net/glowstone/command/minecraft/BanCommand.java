@@ -2,6 +2,7 @@ package net.glowstone.command.minecraft;
 
 import java.util.Collections;
 import java.util.List;
+
 import net.glowstone.GlowServer;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
