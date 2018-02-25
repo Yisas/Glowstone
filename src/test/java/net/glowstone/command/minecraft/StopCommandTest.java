@@ -1,5 +1,7 @@
 package net.glowstone.command.minecraft;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import net.glowstone.GlowServer;
 import net.glowstone.command.CommandUtils;
@@ -8,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -40,6 +43,12 @@ public class StopCommandTest {
 	     PowerMockito.when(sender.getServer()).thenReturn(server);
 
 	}
+
+	 @Test
+	    public void testSuccessExecute() {
+	        assertThat(command.execute(sender, "label", new String[] {"minecraft.command.stop"}), is(true));
+       }
+
 
 
 
