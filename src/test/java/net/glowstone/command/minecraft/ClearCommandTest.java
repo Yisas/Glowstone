@@ -22,6 +22,7 @@ import net.glowstone.inventory.GlowPlayerInventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -30,16 +31,18 @@ import org.bukkit.inventory.ItemStack;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Bukkit.class, CommandUtils.class, GlowServer.class, GlowWorld.class, ItemStack[].class,
 		ItemStack.class, ItemIds.class })
-public class TestClearCommand {
+public class ClearCommandTest {
 
-	private Player fakePlayer1, fakePlayer2, fakePlayer3;
+	private Player fakePlayer1, fakePlayer2;
 	private GlowPlayerInventory fakeEmptyPlayerInventory, fakePlayerInventory;
 	private ItemStack[] fakeInventoryContents;
-	private ItemStack fakeInventoryItem1, fakeInventoryItem2;
+	
+    private static final ItemStack fakeInventoryItem1 = new ItemStack(Material.IRON_LEGGINGS, 1);
+    private static final ItemStack fakeInventoryItem2 = new ItemStack(Material.IRON_HELMET, 1);
 	private String fakeInventoryItem1Name = "minecraft:iron_leggings";
 	private String fakeInventoryItem2Name = "invalid_item_name";
 
-	private CommandSender senderWithoutPermission, senderWithPermission, opPlayer; // sender will not have permission,
+	private CommandSender senderWithoutPermission, senderWithPermission; // sender will not have permission,
 																					// opSender will
 
 	private ClearCommand testedCommand;
@@ -50,11 +53,9 @@ public class TestClearCommand {
 
 		senderWithoutPermission = PowerMockito.mock(CommandSender.class);
 		senderWithPermission = PowerMockito.mock(CommandSender.class);
-		opPlayer = PowerMockito.mock(Player.class);
 
 		fakePlayer1 = PowerMockito.mock(GlowPlayer.class);
 		fakePlayer2 = PowerMockito.mock(GlowPlayer.class);
-		fakePlayer3 = PowerMockito.mock(GlowPlayer.class);
 
 		// Give player 1 an empty inventory
 		fakeEmptyPlayerInventory = PowerMockito.mock(GlowPlayerInventory.class);
@@ -62,14 +63,7 @@ public class TestClearCommand {
 		Mockito.when(fakeEmptyPlayerInventory.getContents()).thenReturn(new ItemStack[10]);
 
 		// Give player 2 a non-empty inventory (2 items)
-		fakeInventoryContents = new ItemStack[2];
-		fakeInventoryItem1 = PowerMockito.mock(ItemStack.class);
-		fakeInventoryItem2 = PowerMockito.mock(ItemStack.class);
-		Mockito.when(fakeInventoryItem1.getAmount()).thenReturn(1);
-		Mockito.when(fakeInventoryItem1.getType()).thenReturn(ItemIds.getItem(fakeInventoryItem1Name));
-		Mockito.when(fakeInventoryItem2.getAmount()).thenReturn(1);
-		Mockito.when(fakeInventoryItem2.getType()).thenReturn(ItemIds.getItem(fakeInventoryItem2Name));
-
+		fakeInventoryContents = new ItemStack[2];	
 		fakeInventoryContents[0] = fakeInventoryItem1;
 		fakeInventoryContents[1] = fakeInventoryItem2;
 		fakePlayerInventory = PowerMockito.mock(GlowPlayerInventory.class);
@@ -78,18 +72,15 @@ public class TestClearCommand {
 
 		Mockito.when(fakePlayer1.getName()).thenReturn("player1");
 		Mockito.when(fakePlayer2.getName()).thenReturn("player2");
-		Mockito.when(fakePlayer3.getName()).thenReturn("thePlayer3");
 
 		Mockito.when(fakePlayer1.getType()).thenReturn(EntityType.PLAYER);
 		Mockito.when(fakePlayer2.getType()).thenReturn(EntityType.PLAYER);
-		Mockito.when(fakePlayer3.getType()).thenReturn(EntityType.PLAYER);
 
 		Mockito.when(senderWithPermission.hasPermission(Mockito.anyString())).thenReturn(true);
 
 		PowerMockito.mockStatic(Bukkit.class);
 		Mockito.when(Bukkit.getPlayerExact("player1")).thenReturn(fakePlayer1);
 		Mockito.when(Bukkit.getPlayerExact("player2")).thenReturn(fakePlayer2);
-		Mockito.when(Bukkit.getPlayerExact("thePlayer3")).thenReturn(fakePlayer3);
 	}
 
 	@Test
