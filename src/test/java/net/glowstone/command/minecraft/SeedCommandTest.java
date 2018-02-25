@@ -52,5 +52,10 @@ public class SeedCommandTest {
 	}
 	
 	
+	
+	@Test
+	public void testExecuteFailure() {
+		assertThat(command.execute(sender, "Label", new String[] {""}), is(false));
+	}
 
 }
