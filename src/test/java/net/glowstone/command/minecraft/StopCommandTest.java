@@ -50,7 +50,11 @@ public class StopCommandTest {
        }
 
 
+	 @Test
+	    public void testFailExecute() {
+	        assertThat(command.execute(failedSender, "label", new String[] {""}), is(false));
 
+	    }
 
 }
 
