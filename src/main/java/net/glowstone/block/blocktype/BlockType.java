@@ -50,7 +50,7 @@ public class BlockType extends ItemType {
      * @return The sound to be played
      */
     @Getter
-    protected SoundInfo placeSound = new SoundInfo(Sound.BLOCK_WOOD_BREAK, 1F, 0.75F);
+    protected SoundInfo placeSound = new SoundInfo(Sound.BLOCK_WOOD_BREAK);
 
     ////////////////////////////////////////////////////////////////////////////
     // Setters for subclass use
@@ -122,7 +122,7 @@ public class BlockType extends ItemType {
      * @param sound The sound.
      */
     public void setPlaceSound(Sound sound) {
-        placeSound = new SoundInfo(sound, 1F, 0.75F);
+        placeSound = new SoundInfo(sound);
     }
 
     ////////////////////////////////////////////////////////////////////////////
