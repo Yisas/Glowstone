@@ -19,10 +19,15 @@ public class JsonPlayerStatisticIoService implements PlayerStatisticIoService {
 
     private GlowServer server;
     private File statsDir;
+    private MongoDbPlayerStatisticIoService mdb;
     
+    /**
+     * Constructor.
+     */
     public JsonPlayerStatisticIoService(GlowServer server, File statsDir) {
         this.server = server;
         this.statsDir = statsDir;
+        this.mdb = new MongoDbPlayerStatisticIoService();
     }
 
     /**
@@ -89,16 +94,13 @@ public class JsonPlayerStatisticIoService implements PlayerStatisticIoService {
         File file = getPlayerFile(player.getUniqueId());
         StatisticMap map = player.getStatisticMap();
         JSONObject json = new JSONObject(map.getValues());
-        
-        // initiate mongo database
-        MongoDbPlayerStatisticIoService mdb = new MongoDbPlayerStatisticIoService();
 
         try {
             FileWriter writer = new FileWriter(file, false);
             writer.write(json.toJSONString());
             writer.close();
             // forklift:
-            
+            this.mdb.forklift(json);
         } catch (IOException e) {
             e.printStackTrace();
         }
