@@ -9,7 +9,6 @@ import java.util.UUID;
 import net.glowstone.GlowServer;
 import net.glowstone.entity.GlowPlayer;
 import net.glowstone.io.PlayerStatisticIoService;
-import net.glowstone.io.nosql.MongoDbPlayerStatisticIoService;
 import net.glowstone.util.StatisticMap;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,15 +18,13 @@ public class JsonPlayerStatisticIoService implements PlayerStatisticIoService {
 
     private GlowServer server;
     private File statsDir;
-    private MongoDbPlayerStatisticIoService mdb;
-    
+        
     /**
      * Constructor.
      */
     public JsonPlayerStatisticIoService(GlowServer server, File statsDir) {
         this.server = server;
         this.statsDir = statsDir;
-        this.mdb = new MongoDbPlayerStatisticIoService();
     }
 
     /**
@@ -94,13 +91,10 @@ public class JsonPlayerStatisticIoService implements PlayerStatisticIoService {
         File file = getPlayerFile(player.getUniqueId());
         StatisticMap map = player.getStatisticMap();
         JSONObject json = new JSONObject(map.getValues());
-
         try {
             FileWriter writer = new FileWriter(file, false);
             writer.write(json.toJSONString());
             writer.close();
-            // forklift:
-            this.mdb.forklift(json);
         } catch (IOException e) {
             e.printStackTrace();
         }
