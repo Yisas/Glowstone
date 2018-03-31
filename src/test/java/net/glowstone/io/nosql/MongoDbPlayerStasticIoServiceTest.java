@@ -72,7 +72,8 @@ public class MongoDbPlayerStasticIoServiceTest {
     
     @Test
     public void testMongoDbStatistic() {
-        // mongostat.readStat("chris");
+        mongostat.forklift((GlowPlayer) fakePlayer1);
+        //mongostat.readStat("player1");
        
     }
 }

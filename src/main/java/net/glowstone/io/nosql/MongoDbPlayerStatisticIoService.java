@@ -36,13 +36,16 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     /**
      * Write json object mongo database.
      * 
-     * @param json statistics
+     * @param player Minecraft player
      */
-    private void forklift(JSONObject json) {
+    public void forklift(GlowPlayer player) {
         MongoCollection<Document> collection = database.getCollection("statistic");
+        // read from server memory alternative we read straight from json file
+        StatisticMap map = player.getStatisticMap();
+        JSONObject json = new JSONObject(map.getValues());
         
         // TODO: overwrite same row if same user
-        Document document = new Document("name", "chris");
+        Document document = new Document("name", player.getName());
         
         // iterate over json and save key value
         for (Iterator ikeys = json.keySet().iterator(); ikeys.hasNext();) {
@@ -58,7 +61,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         
         collection.insertOne(document);
         
-        readStat("chris");
+        readStat(player.getName());
     }
     
     /**
@@ -87,8 +90,8 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
      */
     @Override
     public void writeStatistics(GlowPlayer player) {
-        StatisticMap map = player.getStatisticMap();
-        JSONObject json = new JSONObject(map.getValues());
-        forklift(json);
+        // StatisticMap map = player.getStatisticMap();
+        // JSONObject json = new JSONObject(map.getValues());
+        
     }
 }
