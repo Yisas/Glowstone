@@ -2219,12 +2219,22 @@ public class GlowPlayer extends GlowHumanEntity implements Player {
     public void saveData(boolean async) {
         if (async) {
             Bukkit.getScheduler().runTaskAsynchronously(null, () -> {
+                // Old write
                 server.getPlayerDataService().writeData(GlowPlayer.this);
                 server.getPlayerStatisticIoService().writeStatistics(GlowPlayer.this);
+
+                // New write
+                server.getPlayerMongoDbStatisticIoService().writeStatistics(GlowPlayer.this);
             });
+
+
         } else {
+            // Old write
             server.getPlayerDataService().writeData(this);
             server.getPlayerStatisticIoService().writeStatistics(this);
+
+            // New write
+            server.getPlayerMongoDbStatisticIoService().writeStatistics(this);
         }
     }
 

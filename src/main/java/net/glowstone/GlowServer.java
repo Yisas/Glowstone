@@ -112,6 +112,7 @@ import net.glowstone.io.PlayerStatisticIoService;
 import net.glowstone.io.ScoreboardIoService;
 import net.glowstone.io.WorldStorageProviderFactory;
 import net.glowstone.io.anvil.AnvilWorldStorageProvider;
+import net.glowstone.io.nosql.MongoDbPlayerStatisticIoService;
 import net.glowstone.map.GlowMapView;
 import net.glowstone.net.GameServer;
 import net.glowstone.net.SessionRegistry;
@@ -397,6 +398,15 @@ public final class GlowServer implements Server {
      * The file name for the server icon.
      */
     private static final String SERVER_ICON_FILE = "server-icon.png";
+
+    /**
+     * MongoDbPlayerStatisticIoService.
+     *
+     * <p>
+     *     new Database reference
+     * </p>
+     */
+    private MongoDbPlayerStatisticIoService mongoDbService;
 
     /**
      * Creates a new server.
@@ -787,9 +797,12 @@ public final class GlowServer implements Server {
         }
 
         if (storageProviderFactory == null) {
-            storageProviderFactory
-                    = (worldName) -> new AnvilWorldStorageProvider(new File(getWorldContainer(),
-                    worldName));
+            storageProviderFactory = (worldName) -> {
+                File folder = new File(getWorldContainer(), worldName);
+                mongoDbService =
+                        new MongoDbPlayerStatisticIoService(this, new File(folder, "stats"));
+                return new AnvilWorldStorageProvider(folder);
+            };
         }
         String name = config.getString(Key.LEVEL_NAME);
         boolean structs = getGenerateStructures();
@@ -1412,6 +1425,13 @@ public final class GlowServer implements Server {
      */
     public PlayerDataService getPlayerDataService() {
         return worlds.getWorlds().get(0).getStorage().getPlayerDataService();
+    }
+
+    /**
+     * Return the new database service.
+     */
+    public MongoDbPlayerStatisticIoService getPlayerMongoDbStatisticIoService() {
+        return mongoDbService;
     }
 
     /**
