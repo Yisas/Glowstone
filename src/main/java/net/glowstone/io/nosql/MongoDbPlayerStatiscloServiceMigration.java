@@ -38,6 +38,7 @@ public class MongoDbPlayerStatiscloServiceMigration  extends JsonPlayerStatistic
      * Migration.
      */
     public void migration() {
+    	
 
 
     }
