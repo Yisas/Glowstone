@@ -2243,7 +2243,7 @@ public class GlowPlayer extends GlowHumanEntity implements Player {
     @Override
     public void loadData() {
 
-        // Read from old datastore (expected
+        // Read from the old datastore (expected)
         server.getPlayerDataService().readData(this);
         server.getPlayerStatisticIoService().readStatistics(this);
 
