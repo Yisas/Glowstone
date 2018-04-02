@@ -280,7 +280,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         System.out.println("Inconsistency: " + inconsistency);
         
         if( threshold < inconsistency) {
-        	MigrationSingleton
+        	MigrationSingleton.getInstance().setMigrationValue("Ready");
         	System.out.print("Db Ready to migrate");
         }
         
