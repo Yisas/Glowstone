@@ -43,8 +43,13 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         // read from server memory alternative we read straight from json file
         StatisticMap map = player.getStatisticMap();
         JSONObject json = new JSONObject(map.getValues());
+
+        // lookup up user
+        if (playerExist(collection, player.getName())) {
+            // data already exists
+            return;
+        }
         
-        // TODO: overwrite same row if same user
         Document document = new Document("name", player.getName());
         
         // iterate over json and save key value
@@ -62,6 +67,19 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         collection.insertOne(document);
         
         readStat(player.getName());
+    }
+    
+    /**
+     * Query mongo.
+     */
+    private boolean playerExist(MongoCollection<Document> collection, String name) {
+        
+        long result = collection.count(Filters.eq("name", name));
+        if (result > 0) {
+            // player exists
+            return true;
+        }
+        return false;
     }
     
     /**
