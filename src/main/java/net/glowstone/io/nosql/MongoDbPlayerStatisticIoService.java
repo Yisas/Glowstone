@@ -7,6 +7,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.glowstone.GlowServer;
@@ -22,6 +23,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     private MongoClient mongoClient = new MongoClient("localhost", 27017);
     private MongoDatabase database = mongoClient.getDatabase("soen345");
     private GlowServer server;
+    private HashMap<String, Document> hashDocuments = new HashMap<String, Document>();
     // private File statsDir;
     
     /**
@@ -64,9 +66,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
             document.append(newkey, json.get(key));
         }
         
-        collection.insertOne(document);
-        
-        readStat(player.getName());
+        hashDocuments.put(player.getName(), document);
     }
     
     /**
@@ -108,8 +108,12 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
      */
     @Override
     public void writeStatistics(GlowPlayer player) {
-        // StatisticMap map = player.getStatisticMap();
-        // JSONObject json = new JSONObject(map.getValues());
+
+        MongoCollection<Document> collection = database.getCollection("statistic");
+        Document document = hashDocuments.get(player.getName());
+        collection.insertOne(document);
+        
+        readStat(player.getName());
         
     }
 }
