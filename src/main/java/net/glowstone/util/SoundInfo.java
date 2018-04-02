@@ -28,6 +28,12 @@ public class SoundInfo {
     public SoundInfo(Sound sound) {
         this(sound, 1F, 1F);
     }
+    
+    private SoundInfo(Sound sound, float volume, float pitch) {
+    	this.sound = sound;
+    	this.volume = volume;
+    	this.pitch = pitch;    	
+    }
 
     /**
      * Plays the sound to all players at the given location.

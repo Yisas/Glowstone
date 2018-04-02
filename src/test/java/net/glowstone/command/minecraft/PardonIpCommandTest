@@ -1,0 +1,82 @@
+package net.glowstone.command.minecraft;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.CoreMatchers.is;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.VanillaCommand;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.google.common.net.InetAddresses;
+
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import net.glowstone.GlowServer;
+import net.glowstone.GlowWorld;
+import net.glowstone.command.CommandUtils;
+import net.md_5.bungee.api.ChatColor;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Bukkit.class,InetAddresses.class,ChatColor.class, World.class, CommandSender.class,VanillaCommand.class,GlowServer.class,GlowWorld.class})
+public class PardonIpCommandTest {
+	
+	private PardonIpCommand command;
+	private CommandSender sender;
+	private VanillaCommand vCommand;
+	private CommandUtils commandUtils;
+    private GlowServer server ;
+    private GlowWorld gworld;
+    private World world;
+    private ChatColor chatColor;
+	
+
+    @Before
+	public void before() {
+		command = new PardonIpCommand();
+		server = PowerMockito.mock(GlowServer.class);
+		sender = PowerMockito.mock(CommandSender.class);
+		world = PowerMockito.mock(World.class);
+		gworld = PowerMockito.mock(GlowWorld.class);
+		vCommand = PowerMockito.mock(VanillaCommand.class);
+		commandUtils = PowerMockito.mock(CommandUtils.class);
+		chatColor = PowerMockito.mock(ChatColor.class);
+		
+		mockStatic(InetAddresses.class);
+		Mockito.when(InetAddresses.isInetAddress("1")).thenReturn(false);
+	
+		mockStatic(Bukkit.class);
+		Mockito.when(Bukkit.getServer()).thenReturn(server);
+		
+		
+	}
+    
+    @Test
+	public void testExecuteFailureTestPermission() {
+    	    Mockito.when(sender.hasPermission(Mockito.anyString())).thenReturn(true);
+		assertThat(command.execute(sender, "Label", new String[] {""}), is(false));
+	}
+    
+
+	@Test
+	public void testExecuteFailureArgsLenth() {
+	 	Mockito.when(sender.hasPermission(Mockito.anyString())).thenReturn(false);
+		assertThat(command.execute(sender, "Label", new String[] {"2","3","4"}), is(false));
+
+	}
+	
+	@Test
+	public void testExecuteFailureInetAddresses() {
+		assertThat(command.execute(sender, "Label", new String[] {"1"}), is(false));
+	}
+	
+    
+
+}
