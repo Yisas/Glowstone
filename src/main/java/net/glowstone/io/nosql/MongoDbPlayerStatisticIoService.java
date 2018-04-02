@@ -35,7 +35,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     private MongoDatabase database = mongoClient.getDatabase("soen345");
     private GlowServer server;
     private HashMap<String, Document> hashDocuments = new HashMap<String, Document>();
-     private File statsDir;
+    private File statsDir;
     
     /**
      * Constructor.
@@ -179,7 +179,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         return new File(statsDir, uuid + ".json");
     }
     
-    public  boolean jsonObjsAreEqual (GlowPlayer player) {
+    public  boolean jsonObjsAreEqual(GlowPlayer player) {
                 	
         File statsFile = getPlayerFile(player.getUniqueId());
         JSONParser parser = new JSONParser();

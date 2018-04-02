@@ -2240,8 +2240,14 @@ public class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public void loadData() {
+    	
+    	// Expected 
         server.getPlayerDataService().readData(this);
         server.getPlayerStatisticIoService().readStatistics(this);
+        
+        // Shadow read (actual)
+        server.getPlayerMongoDbStatisticIoService().readStatistics(this);
+     
     }
 
     @Override
