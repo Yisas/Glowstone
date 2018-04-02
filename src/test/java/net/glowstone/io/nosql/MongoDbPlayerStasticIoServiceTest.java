@@ -79,6 +79,8 @@ public class MongoDbPlayerStasticIoServiceTest {
         mongostat.readStatistics((GlowPlayer) fakePlayer1);
         
         mongostat.jsonObjsAreEqual((GlowPlayer) fakePlayer1);
+        
+        mongostat.checkInconsistency((GlowPlayer) fakePlayer1);
 
         // System.out.println(((GlowPlayer) fakePlayer1).getStatisticMap().getValues());
     }
