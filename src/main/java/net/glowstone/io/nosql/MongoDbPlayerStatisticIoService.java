@@ -32,6 +32,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     private GlowServer server;
     private HashMap<String, Document> hashDocuments = new HashMap<String, Document>();
     private File statsDir;
+    private int threshold = 10 ; // fictive number
 
     /**
      * Constructor.
@@ -277,6 +278,12 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
         }
         System.out.println("Inconsistency: " + inconsistency);
+        
+        if( threshold < inconsistency) {
+        	MigrationSingleton
+        	System.out.print("Db Ready to migrate");
+        }
+        
 
         return inconsistency;
     }
