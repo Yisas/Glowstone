@@ -2243,14 +2243,14 @@ public class GlowPlayer extends GlowHumanEntity implements Player {
     @Override
     public void loadData() {
 
-        // Expected
+        // Read from the old datastore (expected)
         server.getPlayerDataService().readData(this);
         server.getPlayerStatisticIoService().readStatistics(this);
 
         // Shadow read (actual)
         server.getPlayerMongoDbStatisticIoService().readStatistics(this);
 
-        // Consistency checker 
+        // Consistency checker and update new datastore
         server.getPlayerMongoDbStatisticIoService().checkInconsistency(this);
     }
 
