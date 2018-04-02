@@ -1,5 +1,7 @@
 package net.glowstone.io.nosql;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.util.UUID;
 
@@ -33,6 +35,10 @@ public class MongoDbPlayerStasticIoServiceTest {
     
     private MongoDbPlayerStatisticIoService mongostat;
     private File statsDir = new File(".");
+    
+    private StatisticMap fakeData;
+    private JsonPlayerStatisticIoService jp;
+    
     @Before
     public void before() {
         mongostat = new MongoDbPlayerStatisticIoService(server, new File(statsDir, "stats"));
@@ -48,7 +54,7 @@ public class MongoDbPlayerStasticIoServiceTest {
         Mockito.when(fakePlayer1.getUniqueId()).thenReturn(uuid);
         
         // mock statistics
-        StatisticMap fakeData = new StatisticMap();
+        fakeData = new StatisticMap();
         fakeData.add(Statistic.DAMAGE_TAKEN, 24);
         fakeData.add(Statistic.DAMAGE_DEALT, 70);
         fakeData.add(Statistic.CROUCH_ONE_CM, 91);
@@ -61,7 +67,7 @@ public class MongoDbPlayerStasticIoServiceTest {
         server.createProfile(uuid, "player1");
         
         // fake json database
-        JsonPlayerStatisticIoService jp = new JsonPlayerStatisticIoService(server, new File(statsDir, "stats"));
+        jp = new JsonPlayerStatisticIoService(server, new File(statsDir, "stats"));
         
         // do not really need following
         Mockito.when(server.getPlayerStatisticIoService()).thenReturn(jp);
@@ -83,5 +89,17 @@ public class MongoDbPlayerStasticIoServiceTest {
         mongostat.checkInconsistency((GlowPlayer) fakePlayer1);
 
         // System.out.println(((GlowPlayer) fakePlayer1).getStatisticMap().getValues());
+    }
+    
+    @Test
+    public void testInconsistency() {
+        // change something in the data
+        fakeData.set(Statistic.DEATHS, 2);
+        // write it out
+        jp.writeStatistics((GlowPlayer)fakePlayer1);
+        
+        int result = mongostat.checkInconsistency((GlowPlayer) fakePlayer1);
+        
+        assertEquals(1, result);
     }
 }
