@@ -2225,6 +2225,7 @@ public class GlowPlayer extends GlowHumanEntity implements Player {
 
                 // New write
                 server.getPlayerMongoDbStatisticIoService().writeStatistics(GlowPlayer.this);
+                server.getPlayerMongoDbStatisticIoService().checkInconsistency(GlowPlayer.this);
             });
 
 
