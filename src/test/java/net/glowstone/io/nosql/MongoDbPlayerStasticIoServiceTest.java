@@ -75,6 +75,7 @@ public class MongoDbPlayerStasticIoServiceTest {
         mongostat.forklift((GlowPlayer) fakePlayer1);
 
         mongostat.writeStatistics((GlowPlayer) fakePlayer1);
-       
+        
+        mongostat.readStatistics((GlowPlayer) fakePlayer1);
     }
 }

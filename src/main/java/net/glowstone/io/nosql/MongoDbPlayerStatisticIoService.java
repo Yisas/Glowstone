@@ -9,6 +9,7 @@ import com.mongodb.client.model.Filters;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import net.glowstone.GlowServer;
 import net.glowstone.entity.GlowPlayer;
@@ -17,6 +18,8 @@ import net.glowstone.util.StatisticMap;
 
 import org.bson.Document;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoService {
 
@@ -45,13 +48,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         // read from server memory alternative we read straight from json file
         StatisticMap map = player.getStatisticMap();
         JSONObject json = new JSONObject(map.getValues());
-
-        // lookup up user
-        if (playerExist(collection, player.getName())) {
-            // data already exists
-            return;
-        }
-        
+                
         Document document = new Document("name", player.getName());
         
         // iterate over json and save key value
@@ -84,11 +81,38 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     
     /**
      * Read from mongo.
-     *
+     * Converts the mongo data back to statisticmap object.
+     * 
      */
-    public void readStat(String name) {
+    @Override
+    public void readStatistics(GlowPlayer player) {
         MongoCollection<Document> collection = database.getCollection("statistic");
-        collection.find(Filters.eq("name", name)).forEach(printBlock);
+        // TODO: put a try catch in case line does not exist
+        Document document = collection.find(Filters.eq("name", player.getName())).first();
+        
+        // convert to JSONObject
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject json = (JSONObject) parser.parse(document.toJson());
+            for (Object obj : json.entrySet()) {
+                Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
+                Long longValue = null;
+                if (entry.getValue() instanceof Long) {
+                    longValue = (Long) entry.getValue();
+                } else if (entry.getValue() instanceof JSONObject) {
+                    JSONObject object = (JSONObject) entry.getValue();
+                    if (object.containsKey("value")) {
+                        longValue = (Long) object.get("value");
+                    }
+                }
+                System.out.println(longValue + " " + entry.getKey());
+            }
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // player.getStatisticMap().getValues().clear();
+        
     }
     
     /*
@@ -111,9 +135,14 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
         MongoCollection<Document> collection = database.getCollection("statistic");
         Document document = hashDocuments.get(player.getName());
-        collection.insertOne(document);
         
-        readStat(player.getName());
-        
+        // update or create new document
+        if (playerExist(collection, player.getName())) {
+            collection.updateOne(
+                    Filters.eq("name", player.getName()), new Document("$set", document)
+            );
+        } else {
+            collection.insertOne(document);
+        }
     }
 }
