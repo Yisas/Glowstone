@@ -77,5 +77,7 @@ public class MongoDbPlayerStasticIoServiceTest {
         mongostat.writeStatistics((GlowPlayer) fakePlayer1);
         
         mongostat.readStatistics((GlowPlayer) fakePlayer1);
+
+        // System.out.println(((GlowPlayer) fakePlayer1).getStatisticMap().getValues());
     }
 }

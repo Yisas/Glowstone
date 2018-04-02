@@ -87,9 +87,14 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     @Override
     public void readStatistics(GlowPlayer player) {
         MongoCollection<Document> collection = database.getCollection("statistic");
-        // TODO: put a try catch in case line does not exist
         Document document = collection.find(Filters.eq("name", player.getName())).first();
-        
+        if (document.isEmpty()) {
+            // not data
+            return;
+        }
+        // clear current statistics in memory
+        player.getStatisticMap().getValues().clear();
+
         // convert to JSONObject
         JSONParser parser = new JSONParser();
         try {
@@ -104,15 +109,22 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
                     if (object.containsKey("value")) {
                         longValue = (Long) object.get("value");
                     }
+                } else {
+                    // if we get here then they are statistics we can ignore
+                    // no need to do anything
                 }
-                System.out.println(longValue + " " + entry.getKey());
+                // put data back into original format and back to player
+                if (longValue != null) {
+                    String newKey = "stat." + entry.getKey();
+                    player.getStatisticMap().getValues()
+                            .put(newKey, longValue.intValue());
+                }
+                
             }
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        // player.getStatisticMap().getValues().clear();
-        
     }
     
     /*
