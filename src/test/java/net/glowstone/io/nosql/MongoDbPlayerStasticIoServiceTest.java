@@ -35,7 +35,7 @@ public class MongoDbPlayerStasticIoServiceTest {
     private File statsDir = new File(".");
     @Before
     public void before() {
-        mongostat = new MongoDbPlayerStatisticIoService(server, statsDir);
+        mongostat = new MongoDbPlayerStatisticIoService(server, new File(statsDir, "stats"));
 
         world = PowerMockito.mock(GlowWorld.class);
         
@@ -77,6 +77,8 @@ public class MongoDbPlayerStasticIoServiceTest {
         mongostat.writeStatistics((GlowPlayer) fakePlayer1);
         
         mongostat.readStatistics((GlowPlayer) fakePlayer1);
+        
+        mongostat.jsonObjsAreEqual((GlowPlayer) fakePlayer1);
 
         // System.out.println(((GlowPlayer) fakePlayer1).getStatisticMap().getValues());
     }

@@ -6,10 +6,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
+import it.unimi.dsi.fastutil.Arrays;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.glowstone.GlowServer;
 import net.glowstone.entity.GlowPlayer;
@@ -27,7 +35,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     private MongoDatabase database = mongoClient.getDatabase("soen345");
     private GlowServer server;
     private HashMap<String, Document> hashDocuments = new HashMap<String, Document>();
-    // private File statsDir;
+     private File statsDir;
     
     /**
      * Constructor.
@@ -35,7 +43,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     public MongoDbPlayerStatisticIoService(GlowServer server, File statsDir) {
         super(server, statsDir);
         this.server = server;
-        // this.statsDir = statsDir;
+        this.statsDir = statsDir;
     }
     
     /**
@@ -157,4 +165,65 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
             collection.insertOne(document);
         }
     }
+    
+    /**
+     * Gets the statistics file for the given UUID.
+     *
+     * @param uuid the UUID of the player
+     * @return the statistics file of the given UUID
+     */
+    private File getPlayerFile(UUID uuid) {
+        if (!statsDir.isDirectory() && !statsDir.mkdirs()) {
+            server.getLogger().warning("Failed to create directory: " + statsDir);
+        }
+        return new File(statsDir, uuid + ".json");
+    }
+    
+    public  boolean jsonObjsAreEqual (GlowPlayer player) {
+                	
+        File statsFile = getPlayerFile(player.getUniqueId());
+        JSONParser parser = new JSONParser();
+        JSONObject js1 = null, js2 = null;
+		try {
+			js1 = (JSONObject) parser.parse(new FileReader(statsFile));
+			 MongoCollection<Document> collection = database.getCollection("statistic");
+		       Document document = collection.find(Filters.eq("name", player.getName())).first();
+		        js2 = (JSONObject) parser.parse(document.toJson());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+      
+      
+    
+      // check size of each json
+
+       JSONObject newJson = new JSONObject();
+       for (Object obj: js2.entrySet()) {
+           Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
+           if(entry.getKey().equals("name") || entry.getKey().equals("_id")){
+        	   continue;
+        	   }
+           
+           newJson.put("stat."+entry.getKey(), entry.getValue());
+           
+          
+        }
+    
+       
+        System.out.println("JS1: " + js1);
+        System.out.println("newJson: " + newJson);
+        
+       
+        
+        return true;
+    }  
+    
+
 }

@@ -1,6 +1,7 @@
 package net.glowstone.io.anvil;
 
 import java.io.File;
+
 import lombok.Getter;
 import net.glowstone.GlowWorld;
 import net.glowstone.io.FunctionIoService;
@@ -14,6 +15,7 @@ import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.io.nbt.NbtScoreboardIoService;
 import net.glowstone.io.nbt.NbtStructureDataService;
 import net.glowstone.io.nbt.NbtWorldMetadataService;
+import net.glowstone.io.nosql.MongoDbPlayerStatisticIoService;
 
 /**
  * A {@link WorldStorageProvider} for the Anvil map format.
@@ -39,6 +41,11 @@ public class AnvilWorldStorageProvider implements WorldStorageProvider {
     @Getter(lazy = true)
     private final JsonPlayerStatisticIoService playerStatisticIoService
             = new JsonPlayerStatisticIoService(world.getServer(), new File(folder, "stats"));
+    @Getter(lazy = true)
+    private final MongoDbPlayerStatisticIoService newPlayerStatisticIoService
+            = new MongoDbPlayerStatisticIoService(world.getServer(), new File(folder, "stats"));
+    
+    
     @Getter(lazy = true)
     private final FunctionIoService functionIoService = new WorldFunctionIoService(world, dataDir);
 
