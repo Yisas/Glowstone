@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,30 +46,33 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
     /**
      * Write json object mongo database.
      * 
-     * @param player
+     * @param players
      *            Minecraft player
      */
-    public void forklift(GlowPlayer player) {
-        MongoCollection<Document> collection = database.getCollection("statistic");
-        // read from server memory alternative we read straight from json file
-        StatisticMap map = player.getStatisticMap();
-        JSONObject json = new JSONObject(map.getValues());
+    public void forklift(List<GlowPlayer> players) {
+    
+        for (GlowPlayer player : players) {
+            MongoCollection<Document> collection = database.getCollection("statistic");
+            // read from server memory alternative we read straight from json file
+            StatisticMap map = player.getStatisticMap();
+            JSONObject json = new JSONObject(map.getValues());
 
-        Document document = new Document("name", player.getName());
+            Document document = new Document("name", player.getName());
 
-        // iterate over json and save key value
-        for (Iterator ikeys = json.keySet().iterator(); ikeys.hasNext();) {
-            String key = (String) ikeys.next();
-            /*
-             * The json key has the format stat.<name>. When storing in mongo
-             * you cannot have the dot notation in the key. We are removing
-             * "stat." and just storing the real name of the key.
-             */
-            String newkey = key.toString().substring(5);
-            document.append(newkey, json.get(key).hashCode());
+            // iterate over json and save key value
+            for (Iterator ikeys = json.keySet().iterator(); ikeys.hasNext();) {
+                String key = (String) ikeys.next();
+                /*
+                * The json key has the format stat.<name>. When storing in mongo
+                * you cannot have the dot notation in the key. We are removing
+                * "stat." and just storing the real name of the key.
+                */
+                String newkey = key.toString().substring(5);
+                document.append(newkey, json.get(key).hashCode());
+            }
+
+            hashDocuments.put(player.getName(), document);
         }
-
-        hashDocuments.put(player.getName(), document);
     }
 
     /**
@@ -269,7 +273,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
             // if (entry.getKey().equalsIgnoreCase("stat.deaths")) {
             // entry.setValue(2);
             // }
-            if (oldValue != (int)entry.getValue()) {
+            if (oldValue != (Long)entry.getValue()) {
 
                 entry.setValue(oldValue);
                 inconsistency++;
