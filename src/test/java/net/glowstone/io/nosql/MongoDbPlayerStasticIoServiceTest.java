@@ -137,14 +137,24 @@ public class MongoDbPlayerStasticIoServiceTest {
     }
     
     @Test
+    /**
+     * Single test to prove whether the consistency checker is working. Uses a single fake entry, modifies its value,
+     * then performs the consistency check expecting an inconsistency
+     */
     public void testInconsistency() {
+    	int originalDeaths = fakeData1.get(Statistic.DEATHS);
+    	
         // change something in the data
-        fakeData1.set(Statistic.DEATHS, 2);
+        fakeData1.set(Statistic.DEATHS, originalDeaths + 1);
         // write it out
         jp.writeStatistics((GlowPlayer)fakePlayer1);
-        
+        // Check consistency
         int result = mongostat.checkInconsistency((GlowPlayer) fakePlayer1);
-        
+        // Expect one inconsistency
         assertEquals(1, result);
+        
+        // Put the value back
+        fakeData1.set(Statistic.DEATHS, originalDeaths);
+        jp.writeStatistics((GlowPlayer)fakePlayer1);        
     }
 }
