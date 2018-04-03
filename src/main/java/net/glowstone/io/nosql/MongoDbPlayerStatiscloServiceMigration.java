@@ -7,6 +7,7 @@ import java.io.File;
 //
 //import com.mongodb.MongoClient;
 //import com.mongodb.client.MongoDatabase;
+import java.util.List;
 
 import org.bson.Document;
 
@@ -29,7 +30,7 @@ public class MongoDbPlayerStatiscloServiceMigration  extends JsonPlayerStatistic
             new MongoDbPlayerStatisticIoService(server, statsDir);
     private JsonPlayerStatisticIoService jsonP = 
             new JsonPlayerStatisticIoService(server, statsDir);
-    private GlowPlayer player;
+    private List<GlowPlayer> players;
     
     
 
@@ -48,11 +49,14 @@ public class MongoDbPlayerStatiscloServiceMigration  extends JsonPlayerStatistic
      */
     public void migration() {
     	Boolean pass = false;
-    	mongoP.forklift(player);
+    	mongoP.forklift(players);
     	
     	// this will read write old and new db and set a inconsistence value
     	//if it reach a certain value it set migration instance to ready
-    int x =	mongoP.checkInconsistency(player);
+    	
+    for(GlowPlayer player : players) {
+        
+    	int x =	mongoP.checkInconsistency(player);
    
     	//This will run the check again and if it true  both data match
     	for(int i = 0 ; i< x ;i++) {
@@ -66,6 +70,7 @@ public class MongoDbPlayerStatiscloServiceMigration  extends JsonPlayerStatistic
     		
     	}
     	
+    }
   
 
 
