@@ -1,33 +1,44 @@
 package net.glowstone.io.nosql;
 
 public class MigrationSingleton {
-	
-		String migration = "";
 
-	    private MigrationSingleton()
-	    {}
-	     
+    String migration = "";
 
-	    private static MigrationSingleton INSTANCE = null;
-	     
+    /**
+     * Singleton constructor.
+     */
+    private MigrationSingleton() {}
 
-	    public static synchronized MigrationSingleton getInstance()
-	    {           
-	        if (INSTANCE == null)
-	        {   INSTANCE = new MigrationSingleton(); 
-	        }
-	        return INSTANCE;
-	    }
-	    
-	    
-	    public String getMigrationValue() {
-	        return this.migration;
-	    }
-	    
-	    public void setMigrationValue(String migration) {
-	    	this.migration = migration;
-	    }
-	    
-	
+    private static MigrationSingleton INSTANCE = null;
+
+    /**
+     * Singleton.
+     *  
+     * @return singleton instance
+     */
+    public static synchronized MigrationSingleton getInstance() {           
+        if (INSTANCE == null) {   
+            INSTANCE = new MigrationSingleton(); 
+        }
+        return INSTANCE;
+    }
+
+    /**
+     * Getter.
+     * 
+     * @return migration string value
+     */
+    public String getMigrationValue() {
+        return this.migration;
+    }
+
+    /**
+     * Set migration value.
+     * 
+     * @param migration string value
+     */
+    public void setMigrationValue(String migration) {
+        this.migration = migration;
+    }
 
 }
