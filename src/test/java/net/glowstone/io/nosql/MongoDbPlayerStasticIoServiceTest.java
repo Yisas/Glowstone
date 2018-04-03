@@ -53,6 +53,11 @@ public class MongoDbPlayerStasticIoServiceTest {
 
         world = PowerMockito.mock(GlowWorld.class);
         
+        // Player datasets to mock
+     // Example of a json player object
+        // {"stat.damageTaken":24,"stat.damageDealt":70,"stat.crouchOneCm":91,"stat.deaths":1,"stat.walkOneCm":95710,"stat.swimOneCm":2737,"stat.playOneMinute":217346,"stat.mobKills":4,"stat.leaveGame":13,"stat.sneakTime":57}
+        //----------------------------------------------------------
+        // Player 1
         fakePlayer1 = PowerMockito.mock(GlowPlayer.class);
         UUID uuid1 = UUID.fromString("334419cc-e197-427a-9414-dd828b401fc4");
         final Location location1 = new Location(world, 10.5, 20.0, 30.5);
@@ -67,6 +72,7 @@ public class MongoDbPlayerStasticIoServiceTest {
         fakeData1.add(Statistic.DEATHS, 1);
         Mockito.when(((GlowPlayer) fakePlayer1).getStatisticMap()).thenReturn(fakeData1);
         
+        // Player 2
 		fakePlayer2 = PowerMockito.mock(GlowPlayer.class);
 		UUID uuid2 = UUID.fromString("334419cc-e197-427a-9414-dd828b401fc5");
 		final Location location2 = new Location(world, 200.5, 145.0, 332.0);
@@ -81,6 +87,7 @@ public class MongoDbPlayerStasticIoServiceTest {
 		fakeData2.add(Statistic.DEATHS, 10);
 		Mockito.when(((GlowPlayer) fakePlayer2).getStatisticMap()).thenReturn(fakeData2);
 		
+		// Player 3
 		fakePlayer3 = PowerMockito.mock(GlowPlayer.class);
 		UUID uuid3 = UUID.fromString("334419cc-e197-427a-9414-dd828b401fc6");
 		final Location location3 = new Location(world, 126.0, 92.0, 85.5);
@@ -93,9 +100,8 @@ public class MongoDbPlayerStasticIoServiceTest {
 		fakeData3.add(Statistic.DAMAGE_DEALT, 32);
 		fakeData3.add(Statistic.CROUCH_ONE_CM, 49);
 		fakeData3.add(Statistic.DEATHS, 3);
-		Mockito.when(((GlowPlayer) fakePlayer3).getStatisticMap()).thenReturn(fakeData3);
-        
-        // {"stat.damageTaken":24,"stat.damageDealt":70,"stat.crouchOneCm":91,"stat.deaths":1,"stat.walkOneCm":95710,"stat.swimOneCm":2737,"stat.playOneMinute":217346,"stat.mobKills":4,"stat.leaveGame":13,"stat.sneakTime":57}
+		Mockito.when(((GlowPlayer) fakePlayer3).getStatisticMap()).thenReturn(fakeData3);	
+        //----------------------------------------------------------
 
         server = PowerMockito.mock(GlowServer.class);
         server.createProfile(uuid2, "player1");

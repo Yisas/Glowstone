@@ -69,6 +69,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
                 * "stat." and just storing the real name of the key.
                 */
                 String newkey = key.toString().substring(5);
+                // Record a hash as opposed to an entire value
                 document.append(newkey, json.get(key).hashCode());
             }
 
@@ -245,18 +246,23 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         JSONParser parser = new JSONParser();
         JSONObject js1 = null;
         JSONObject js2 = null;
-
+        
+        // Read new dataset
         MongoCollection<Document> collection = database
                 .getCollection("statistic");
         Document document = collection.find(
                 Filters.eq("name", player.getName())).first();
         try {
+        	// Read old dataset
             js1 = (JSONObject) parser.parse(new FileReader(statsFile));
+            
             js2 = (JSONObject) parser.parse(document.toJson());
         } catch (ParseException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        // Populate new dataset as json object (compatible with old dataset)
         JSONObject newJson = new JSONObject();
         for (Object obj : js2.entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
@@ -267,6 +273,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
             newJson.put("stat." + entry.getKey(), entry.getValue());
         }
 
+        // Compare new with old, record inconsistency
         for (Object obj : newJson.entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
@@ -283,6 +290,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         }
         System.out.println("Inconsistency: " + inconsistency);
         
+        // If inconsistency is below a threshold, record that a migration is possible
         if( threshold < inconsistency) {
         	MigrationSingleton.getInstance().setMigrationValue("Ready");
         	System.out.print("Db Ready to migrate");
