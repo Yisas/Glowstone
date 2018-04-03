@@ -13,19 +13,19 @@ public class MigrationSingleton {
 
     /**
      * Singleton.
-     *  
+     *
      * @return singleton instance
      */
-    public static synchronized MigrationSingleton getInstance() {           
-        if (INSTANCE == null) {   
-            INSTANCE = new MigrationSingleton(); 
+    public static synchronized MigrationSingleton getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MigrationSingleton();
         }
         return INSTANCE;
     }
 
     /**
      * Getter.
-     * 
+     *
      * @return migration string value
      */
     public String getMigrationValue() {
@@ -34,7 +34,7 @@ public class MigrationSingleton {
 
     /**
      * Set migration value.
-     * 
+     *
      * @param migration string value
      */
     public void setMigrationValue(String migration) {

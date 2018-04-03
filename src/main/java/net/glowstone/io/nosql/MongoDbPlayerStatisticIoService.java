@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,31 +46,35 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
     /**
      * Write json object mongo database.
-     * 
-     * @param player
+     *
+     * @param players
      *            Minecraft player
      */
-    public void forklift(GlowPlayer player) {
-        MongoCollection<Document> collection = database.getCollection("statistic");
-        // read from server memory alternative we read straight from json file
-        StatisticMap map = player.getStatisticMap();
-        JSONObject json = new JSONObject(map.getValues());
+    public void forklift(List<GlowPlayer> players) {
 
-        Document document = new Document("name", player.getName());
+        for (GlowPlayer player : players) {
+            MongoCollection<Document> collection = database.getCollection("statistic");
+            // read from server memory alternative we read straight from json file
+            StatisticMap map = player.getStatisticMap();
+            JSONObject json = new JSONObject(map.getValues());
 
-        // iterate over json and save key value
-        for (Iterator ikeys = json.keySet().iterator(); ikeys.hasNext();) {
-            String key = (String) ikeys.next();
-            /*
-             * The json key has the format stat.<name>. When storing in mongo
-             * you cannot have the dot notation in the key. We are removing
-             * "stat." and just storing the real name of the key.
-             */
-            String newkey = key.toString().substring(5);
-            document.append(newkey, json.get(key));
+            Document document = new Document("name", player.getName());
+
+            // iterate over json and save key value
+            for (Iterator ikeys = json.keySet().iterator(); ikeys.hasNext();) {
+                String key = (String) ikeys.next();
+                /*
+                * The json key has the format stat.<name>. When storing in mongo
+                * you cannot have the dot notation in the key. We are removing
+                * "stat." and just storing the real name of the key.
+                */
+                String newkey = key.toString().substring(5);
+                // Record a hash as opposed to an entire value
+                document.append(newkey, json.get(key).hashCode());
+            }
+
+            hashDocuments.put(player.getName(), document);
         }
-
-        hashDocuments.put(player.getName(), document);
     }
 
     /**
@@ -88,7 +93,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
     /**
      * Read from mongo. Converts the mongo data back to statisticmap object.
-     * 
+     *
      */
     @Override
     public void readStatistics(GlowPlayer player) {
@@ -183,7 +188,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
     /**
      * Check if old and new data match.
-     * 
+     *
      * @param player Minecraft player
      * @return true if json objects match
      */
@@ -229,7 +234,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
     /**
      * Check old and new data for inconsistencies.
-     * 
+     *
      * @param player Minecraft player
      * @return number of inconsistencies found
      */
@@ -242,17 +247,22 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         JSONObject js1 = null;
         JSONObject js2 = null;
 
+        // Read new dataset
         MongoCollection<Document> collection = database
                 .getCollection("statistic");
         Document document = collection.find(
                 Filters.eq("name", player.getName())).first();
         try {
+            // Read old dataset
             js1 = (JSONObject) parser.parse(new FileReader(statsFile));
+
             js2 = (JSONObject) parser.parse(document.toJson());
         } catch (ParseException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        // Populate new dataset as json object (compatible with old dataset)
         JSONObject newJson = new JSONObject();
         for (Object obj : js2.entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
@@ -263,14 +273,15 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
             newJson.put("stat." + entry.getKey(), entry.getValue());
         }
 
+        // Compare new with old, record inconsistency
         for (Object obj : newJson.entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
-            Object oldValue = js1.get(entry.getKey());
+            int oldValue = js1.get(entry.getKey()).hashCode();
             // if (entry.getKey().equalsIgnoreCase("stat.deaths")) {
             // entry.setValue(2);
             // }
-            if (!oldValue.equals(entry.getValue())) {
+            if (oldValue != (Long)entry.getValue()) {
 
                 entry.setValue(oldValue);
                 inconsistency++;
@@ -278,7 +289,6 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
 
         }
         System.out.println("Inconsistency: " + inconsistency);
-
         if (threshold < inconsistency) {
             MigrationSingleton.getInstance().setMigrationValue("Ready");
             System.out.print("Db Ready to migrate");
