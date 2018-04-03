@@ -65,7 +65,7 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
              * "stat." and just storing the real name of the key.
              */
             String newkey = key.toString().substring(5);
-            document.append(newkey, json.get(key));
+            document.append(newkey, json.get(key).hashCode());
         }
 
         hashDocuments.put(player.getName(), document);
@@ -265,11 +265,11 @@ public class MongoDbPlayerStatisticIoService extends JsonPlayerStatisticIoServic
         for (Object obj : newJson.entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
-            Object oldValue = js1.get(entry.getKey());
+            int oldValue = js1.get(entry.getKey()).hashCode();
             // if (entry.getKey().equalsIgnoreCase("stat.deaths")) {
             // entry.setValue(2);
             // }
-            if (!oldValue.equals(entry.getValue())) {
+            if (oldValue != (int)entry.getValue()) {
 
                 entry.setValue(oldValue);
                 inconsistency++;
