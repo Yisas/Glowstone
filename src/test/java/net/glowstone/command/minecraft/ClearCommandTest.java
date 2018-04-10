@@ -132,6 +132,7 @@ public class ClearCommandTest {
 	public void testClearAll() {
 		assertThat(testedCommand.execute(senderWithPermission, "label", new String[] { "player2" }), is(true));
 		Mockito.verify(senderWithPermission).sendMessage(eq("Cleared the inventory of player2, removing 2 items"));
+		Mockito.verify(Bukkit.getPlayerExact("player2").getInventory(), times(1)).clear();
 	}
 
 	/**
@@ -142,6 +143,7 @@ public class ClearCommandTest {
 		assertThat(testedCommand.execute(senderWithPermission, "label",
 				new String[] { "player2", fakeInventoryItem1Name }), is(true));
 		Mockito.verify(senderWithPermission).sendMessage(eq("Cleared the inventory of player2, removing 1 items"));
+		Mockito.verify(Bukkit.getPlayerExact("player2").getInventory(), times(1)).remove(fakeInventoryItem1);				
 	}
 
 	/**
